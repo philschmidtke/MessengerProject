@@ -48,7 +48,7 @@
                                     <input type="text" class="input" placeholder="Deine Nachricht..." id="message">
                                 </div>
                                 <div class="col-md-2">
-                                    <button class="button green" onclick="SendMessage();">
+                                    <button class="button green" onclick="SendMessage();" style="width:90%;">
                                         <i class="fas fa-paper-plane"></i>
                                     </button>
                                 </div>
@@ -69,17 +69,13 @@
 <script>
     var chats = [];
 
-    window.onload = function() {
+    window.onload = function () {
         LoadMessage();
+        UserSearch();
     }
 
-    setInterval(() => {
-        ClearContacts();
-        GetChatList();
-    }, 30000);
 
     setInterval(() => {
-        ClearContacts();
         LoadMessage();
     }, 1000);
 
@@ -118,43 +114,53 @@
     }
 
     function UserSearch() {
-        ClearContacts()
+        ClearContacts();
 
         var text = document.getElementById("user_search").value;
 
         if (text.trim() == "") {
-            ClearContacts();
-            GetChatList();
+            $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                type: "getlist"
+            })
+                    .done(function (data) {
+                        ClearContacts();
+                        for (x in data) {
+                            if (data[x].message == null) {
+                                data[x].message = ""
+                            }
+                            AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
+                        }
+                    });
         } else {
             $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
-                    type: "all",
-                    username: text
-                })
-                .done(function(data) {
-                    for (x in data) {
-                        console.log(data[x].username)
-                        AddContactForFriend(data[x].username, data[x].avatar, data[x].id);
+                type: "all",
+                username: text
+            })
+                    .done(function (data) {
+                         ClearContacts();
+                        for (x in data) {
+                            AddContactForFriend(data[x].username, data[x].avatar, data[x].id);
 
-                        if (data[x].status == 1) {
-                            text = "friend_" + data[x].id
-                            var element = document.getElementById(text);
-                            element.classList.remove("green");
-                            var element = document.getElementById(text);
-                            element.classList.add("yellow");
-                            document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
-                            document.getElementById(text).removeAttribute("onclick");
-                        } else if (data[x].status == 2) {
-                            text = "friend_" + data[x].id
-                            var element = document.getElementById(text);
-                            element.classList.remove("green");
-                            var element = document.getElementById(text);
-                            element.classList.add("blue");
-                            document.getElementById(text).innerHTML = '<i class="fas fa-comment"></i>';
-                            document.getElementById(text).removeAttribute("onclick");
-                            document.getElementById(text).setAttribute("onclick", "BeginChat(" + data[x].id + ")");
+                            if (data[x].status == 1) {
+                                text = "friend_" + data[x].id
+                                var element = document.getElementById(text);
+                                element.classList.remove("green");
+                                var element = document.getElementById(text);
+                                element.classList.add("yellow");
+                                document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
+                                document.getElementById(text).removeAttribute("onclick");
+                            } else if (data[x].status == 2) {
+                                text = "friend_" + data[x].id
+                                var element = document.getElementById(text);
+                                element.classList.remove("green");
+                                var element = document.getElementById(text);
+                                element.classList.add("blue");
+                                document.getElementById(text).innerHTML = '<i class="fas fa-comment"></i>';
+                                document.getElementById(text).removeAttribute("onclick");
+                                document.getElementById(text).setAttribute("onclick", "BeginChat(" + data[x].id + ")");
+                            }
                         }
-                    }
-                });
+                    });
         }
     }
 
@@ -167,89 +173,67 @@
 
     function SendRequest(id) {
         $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
-                type: "add",
-                id: id
-            })
-            .done(function(data) {
-                if (data.type == 'success') {
-                    text = "friend_" + id
-                    var element = document.getElementById(text);
-                    element.classList.remove("green");
-                    var element = document.getElementById(text);
-                    element.classList.add("yellow");
-                    document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
-                    document.getElementById(text).removeAttribute("onclick");
-                }
+            type: "add",
+            id: id
+        })
+                .done(function (data) {
+                    if (data.type == 'success') {
+                        text = "friend_" + id
+                        var element = document.getElementById(text);
+                        element.classList.remove("green");
+                        var element = document.getElementById(text);
+                        element.classList.add("yellow");
+                        document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
+                        document.getElementById(text).removeAttribute("onclick");
+                    }
 
-                Swal.fire({
-                    position: 'top-end',
-                    icon: data.type,
-                    title: data.msg,
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            });
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: data.type,
+                        title: data.msg,
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                });
     }
 
     function RemoveFriend(id) {
         $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
-                type: "remove",
-                id: id
-            })
-            .done(function(data) {
-                if (data.type == 'success') {
-                    text = "friend_" + id
-                    var element = document.getElementById(text);
-                    element.classList.remove("red");
-                    var element = document.getElementById(text);
-                    element.classList.add("green");
-                    document.getElementById(text).innerHTML = '<i class="fas fa-user-plus"></i>';
-                }
+            type: "remove",
+            id: id
+        })
+                .done(function (data) {
+                    if (data.type == 'success') {
+                        text = "friend_" + id
+                        var element = document.getElementById(text);
+                        element.classList.remove("red");
+                        var element = document.getElementById(text);
+                        element.classList.add("green");
+                        document.getElementById(text).innerHTML = '<i class="fas fa-user-plus"></i>';
+                    }
 
-                Swal.fire({
-                    position: 'top-end',
-                    icon: data.type,
-                    title: data.msg,
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            });
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: data.type,
+                        title: data.msg,
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                });
     }
 
 
     function BeginChat(id) {
         $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                type: "create",
-                id: id
-            })
-            .done(function(data) {
-                window.location = "<?php echo $_SITE['path'] ?>/chat/" + data.id
-            });
-    }
-
-    function GetChatList() {
-        ClearContacts()
-
-        var text = document.getElementById("user_search").value;
-
-        if (text.trim() == "") {
-
-            ClearContacts();
-            $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                    type: "getlist"
-                })
-                .done(function(data) {
-                    for (x in data) {
-                        if (data[x].message == null) {
-                            data[x].message = ""
-                        }
-                        AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
-                    }
+            type: "create",
+            id: id
+        })
+                .done(function (data) {
+                    window.location = "<?php echo $_SITE['path'] ?>/chat/" + data.id
                 });
-        } else {
-            UserSearch();
-        }
     }
+
+
 
     function ClearMessage() {
         //chat_messagecontainer
@@ -289,41 +273,44 @@
         text = document.getElementById("message").value
 
         $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                type: "send",
-                chat: "<?php echo $chat->id ?>",
-                message: text
-            })
-            .done(function(data) {
-                console.log("Erfolg");
-                if (data.type == 'success') {
-                    document.getElementById("message").value = ""
-                } else {
-                    console.log(data.msg);
-                }
-            });
+            type: "send",
+            chat: "<?php echo $chat->id ?>",
+            message: text
+        })
+                .done(function (data) {
+                    console.log("Erfolg");
+                    if (data.type == 'success') {
+                        document.getElementById("message").value = ""
+                        AddMessage('1', text, data.time);
+                        chats.push(data.id);
+                        ScrollDown();
+                        UserSearch();
+                    } else {
+                        console.log(data.msg);
+                    }
+                });
 
     }
 
     function LoadMessage() {
         mykey = localStorage.getItem('<?php echo $user->username ?>');
-        ClearContacts();
-        GetChatList();
 
         $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                type: "load",
-                chat: "<?php echo $chat->id ?>",
-                mykey: mykey
-            })
-            .done(function(data) {
-                for (x in data) {
-                    if (chats.includes(data[x].id) == false) {
-                        AddMessage(data[x].type, data[x].message, data[x].date);
-                        chats.push(data[x].id);
-                        DeleteMessage(data[x].id);
-                        ScrollDown();
+            type: "load",
+            chat: "<?php echo $chat->id ?>",
+            mykey: mykey
+        })
+                .done(function (data) {
+                    for (x in data) {
+                        if (chats.includes(data[x].id) == false) {
+                            AddMessage(data[x].type, data[x].message, data[x].date);
+                            chats.push(data[x].id);
+                            DeleteMessage(data[x].id);
+                            ScrollDown();
+                            UserSearch();
+                        }
                     }
-                }
-            });
+                });
     }
 
     function ScrollDown() {
@@ -333,11 +320,11 @@
 
     function DeleteMessage(id) {
         $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                id: id,
-                type: "delete"
-            })
-            .done(function(data) {
-                console.log(data.msg);
-            });
+            id: id,
+            type: "delete"
+        })
+                .done(function (data) {
+                    console.log(data.msg);
+                });
     }
 </script>

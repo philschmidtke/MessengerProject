@@ -112,7 +112,9 @@ if ($type == "send") {
 
 
         Message::Add($chat->id, 1, base64_encode($message1), base64_encode($message2));
-
+        $message_id = Message::GetID($chat->id, 1, base64_encode($message1), base64_encode($message2));
+        
+        
         $success = true;
         $msg = 'Erfolg';
     }
@@ -121,14 +123,17 @@ if ($type == "send") {
 
     if ($error == true) {
         $status = 'error';
+        $mid = "";
     } elseif ($success == true) {
         $status = 'success';
+        $mid =  $message_id;
     }
 
     $array = array(
         "type" => $status,
         "time" => $time,
-        "msg" => $msg
+        "msg" => $msg,
+        "id" => (int) $mid
     );
 
     header("Content-Type: application/json");

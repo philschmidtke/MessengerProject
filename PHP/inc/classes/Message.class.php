@@ -98,6 +98,16 @@ class Message {
             return false;
         }
     }
+    
+    public static function GetID($chat, $status, $message, $message2) {
+        global $mysqli;
+        
+        $query = $mysqli->query("SELECT id FROM chat_message WHERE chat_id = '".$chat."' AND status = '".$status."' AND message = '".$message."' AND message_2 = '".$message2."' ORDER BY id DESC");
+        $row = $query->fetch_object();
+        
+        
+        return $row->id;
+    }
 
 
 

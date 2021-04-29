@@ -3,7 +3,7 @@
 //CORE
 
 ini_set('max_execution_time', 5);
-error_reporting(0);
+//error_reporting(0);
 session_start();
 date_default_timezone_set("Europe/Berlin");
 header('Content-Type: text/html; charset=UTF-8');

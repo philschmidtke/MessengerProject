@@ -2,10 +2,10 @@
 //CONFIG
 
 class Config  {
-    var $host = '127.0.0.1';
-    var $user = 'root';
-    var $pass = 'test';
-    var $db = 'chat';
+    var $host = '161.97.138.181';
+    var $user = 'cicek_db2';
+    var $pass = 'en6R3SjtNQ?b';
+    var $db = 'cicek_db2';
     var $connect;
 
     function connect() {
@@ -25,7 +25,7 @@ $mysqli = $connection->connect();
 
 $_SITE = array(
   "name" => "Chat-System",
-  "path" => "http://127.0.0.1",
+  "path" => "https://chat.cicek.li",
 );
 
 ?>
