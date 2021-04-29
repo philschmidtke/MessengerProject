@@ -1,15 +1,15 @@
 <?php
 
-//Client Key
 $keypair = sodium_crypto_box_keypair();
 
+$key = base64_encode($keypair);
 
-//Server Key
+$second = base64_decode($key);
+
 $publicKey = sodium_crypto_box_publickey($second);
 
 $plaintextMessage = "mehmet ist ein kek";
 
-echo $publicKey;
 
 // ...
 $encrypted = sodium_crypto_box_seal(
@@ -26,4 +26,6 @@ $decrypted = sodium_crypto_box_seal_open(
     $the,
     $second
 );
+
+echo $decrypted;
 

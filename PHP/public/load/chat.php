@@ -134,3 +134,85 @@ if ($type == "send") {
     header("Content-Type: application/json");
     echo json_encode($array, JSON_PRETTY_PRINT);
 }
+
+
+if ($type == 'load') {
+    $chat = $_POST['chat'];
+    $mykey = $_POST['mykey'];
+
+    if (Chat::CheckID($chat) == false) {
+        $error = true;
+        $msg = 'Chat existiert nicht!';
+    }
+
+    $chat = new Chat($chat);
+
+    if ($chat->first != $user->id and $chat->second != $user->id) {
+        $error = true;
+        $msg = 'Keine Berechtigung';
+    }
+
+    if ($error == false) {
+        $array = array();
+
+        foreach (Message::GetAll($chat->id) as $as => $message) {
+            if ($message->user_id == $user->id) {
+                $stat = 1;
+                $text = Message::Decrypt($message->message_2, $mykey);
+            } else {
+                $stat = 2;
+                $text = Message::Decrypt($message->message, $mykey);
+            }
+
+            $array[] = array(
+                "id" => (int) $message->id,
+                "type" => (int) $stat,
+                "date" => date('d.m.Y H:i', $message->timestamp),
+                "message" => $text
+            );
+        }
+
+        header("Content-Type: application/json");
+        echo json_encode($array, JSON_PRETTY_PRINT);
+    }
+}
+
+
+if ($type == 'delete') {
+    $id = $_POST['id'];
+
+    if (Message::CheckID($id) == false) {
+        $error = true;
+        $msg = 'Diese Nachricht existiert nicht!';
+    }
+
+    $message = new Message($id);
+    $chat = new Chat($message->chat_id);
+
+    if ($chat->first != $user->id and $chat->second != $user->id) {
+        $error = true;
+        $msg = 'Keine Berechtigung';
+    }
+
+    if ($message->user_id == $user->id) {
+        $error = true;
+        $msg = 'Deine Nachrichten werden nicht von dir gelöscht!';
+    }
+
+    if ($error == false) {
+        $message->Delete();
+
+        $success = true;
+        $msg = 'Gelöscht!';
+    }
+
+    if ($error == true) {
+        $type = 'error';
+    } elseif ($success == true) {
+        $type = 'success';
+    }
+
+
+    header("Content-Type: application/json");
+    echo json_encode($array, JSON_PRETTY_PRINT);
+}

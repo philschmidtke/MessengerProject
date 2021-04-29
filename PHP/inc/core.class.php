@@ -26,19 +26,19 @@ function protect($string, $output = false) {
 
 if ($_POST) {
     foreach ($_POST as $key => $val) {
-        if ($key == 'password') {
+        if ($key == 'password' OR $key == 'key') {
 
         } else {
             $_POST[$key] = $mysqli->real_escape_string(protect(htmlspecialchars($val)));
         }
     }
 }
+
 if ($_GET) {
     foreach ($_GET as $key => $val) {
-        $_GET[$key] = $mysqli->real_escape_string(protect(htmlspecialchars($val)));
+            $_GET[$key] = $mysqli->real_escape_string(protect(htmlspecialchars($val)));
     }
 }
-
 spl_autoload_register(function ($class_name) {
     include 'classes/' . $class_name . '.class.php';
 });
@@ -47,4 +47,3 @@ spl_autoload_register(function ($class_name) {
 if(isset($_SESSION['username'])) {
     $user = new User(User::GetID($_SESSION['username']));
 }
-?>

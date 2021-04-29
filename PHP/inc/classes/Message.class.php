@@ -17,6 +17,14 @@ class Message {
         }
     }
 
+    public function Delete() {
+        global $mysqli;
+
+        $mysqli->query("DELETE FROM chat_message WHERE id = '".$this->id."'");
+
+        return true;
+    }
+
 
     public static function Add($chat, $status, $message, $message2) {
         global $mysqli;
@@ -68,7 +76,8 @@ class Message {
     //Entschlüsseln
     public static function Decrypt($text, $key) {
 
-        $key = base64_decode($key);
+       $text = base64_decode($text);
+       $key = base64_decode($key);
 
         $decrypted = sodium_crypto_box_seal_open(
             $text,
@@ -77,6 +86,20 @@ class Message {
         
         return $decrypted;
     }
+
+    public static function CheckID($id) {
+        global $mysqli;
+
+        $query = $mysqli->query("SELECT id FROM chat_message WHERE id = '".$id."'");
+
+        if($query->num_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
 
 

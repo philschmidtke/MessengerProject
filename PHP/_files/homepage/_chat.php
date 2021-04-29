@@ -41,31 +41,7 @@
                     <div class="col-md-8">
                         <?php if ($url != 'index') { ?>
                             <div class="chat_messagecontainer" id="chat_messagecontainer">
-                                <?php foreach (Message::GetAll($chat->id) as $as => $message) { ?>
-                                    <?php if ($message->user_id == $user->id) { ?>
-                                        <div class="row">
-                                            <div class="col-md-6"></div>
-                                            <div class="col-md-6">
-                                                <div class="chat_messagebox">
-                                                    {MESSAGE}<br><br>
-                                                    <small style="color:#e0e0e0;font-size:10px;float:right;">
-                                                        {DATE} </small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php } else { ?>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="chat_messagebox">
-                                                    {MESSAGE}<br><br>
-                                                    <small style="color:#e0e0e0;font-size:10px;float:right;">
-                                                        {DATE} </small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6"></div>
-                                        </div>
-                                    <?php } ?>
-                                <?php } ?>
+
                             </div>
                             <div class="row">
                                 <div class="col-md-10">
@@ -91,14 +67,22 @@
 
 
 <script>
+    var chats = [];
+
     window.onload = function() {
-        GetChatList();
+        LoadMessage();
     }
 
     setInterval(() => {
         ClearContacts();
         GetChatList();
     }, 30000);
+
+    setInterval(() => {
+        ClearContacts();
+        LoadMessage();
+    }, 1000);
+
 
     function AddContactForFriend(username, avatar, id) {
         $(".chat_contact").append('<div  class="chat_user">\n\
@@ -108,7 +92,6 @@
                 \n\</div>\n\
                 \n\<div class="col-md-6">\n\
                 \n\<b>' + username + '</b>\n\
-                \n\<p>{Nachricht}</p>\n\
                 \n\</div>\n\
                 \n\<div class="col-md-3">\n\
                 \n\<button class="button green" onclick="SendRequest(' + id + ')" style="width:auto;margin-top:2px;padding-left:20px;padding-right:20px;" id="friend_' + id + '">\n\
@@ -128,7 +111,6 @@
                 \n\</div>\n\
                 \n\<div class="col-md-9">\n\
                 \n\<b>' + username + '</b>\n\
-                \n\<p>' + message + '</p>\n\
                 \n\</div>\n\
                 \n\</div>\n\
                 \n\</div>\n\
@@ -141,6 +123,7 @@
         var text = document.getElementById("user_search").value;
 
         if (text.trim() == "") {
+            ClearContacts();
             GetChatList();
         } else {
             $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
@@ -245,17 +228,27 @@
     }
 
     function GetChatList() {
-        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
-                type: "getlist"
-            })
-            .done(function(data) {
-                for (x in data) {
-                    if (data[x].message == null) {
-                        data[x].message = ""
+        ClearContacts()
+
+        var text = document.getElementById("user_search").value;
+
+        if (text.trim() == "") {
+
+            ClearContacts();
+            $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                    type: "getlist"
+                })
+                .done(function(data) {
+                    for (x in data) {
+                        if (data[x].message == null) {
+                            data[x].message = ""
+                        }
+                        AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
                     }
-                    AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
-                }
-            });
+                });
+        } else {
+            UserSearch();
+        }
     }
 
     function ClearMessage() {
@@ -303,13 +296,48 @@
             .done(function(data) {
                 console.log("Erfolg");
                 if (data.type == 'success') {
-                    AddMessage(1, text, data.time);
                     document.getElementById("message").value = ""
-                    console.log(data.msg);
                 } else {
                     console.log(data.msg);
                 }
             });
 
+    }
+
+    function LoadMessage() {
+        mykey = localStorage.getItem('<?php echo $user->username ?>');
+        ClearContacts();
+        GetChatList();
+
+        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                type: "load",
+                chat: "<?php echo $chat->id ?>",
+                mykey: mykey
+            })
+            .done(function(data) {
+                for (x in data) {
+                    if (chats.includes(data[x].id) == false) {
+                        AddMessage(data[x].type, data[x].message, data[x].date);
+                        chats.push(data[x].id);
+                        DeleteMessage(data[x].id);
+                        ScrollDown();
+                    }
+                }
+            });
+    }
+
+    function ScrollDown() {
+        var objDiv = document.getElementById("chat_messagecontainer");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    function DeleteMessage(id) {
+        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                id: id,
+                type: "delete"
+            })
+            .done(function(data) {
+                console.log(data.msg);
+            });
     }
 </script>

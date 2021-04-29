@@ -23,7 +23,7 @@
 
 <script>
     GetNotification();
-    
+
     setInterval(() => {
         GetNotification();
     }, 30000);
@@ -82,6 +82,7 @@
             .done(function(data) {
                 if (data.type == 'success') {
                     document.getElementById("friend_" + id).remove();
+                    GetNotification();
                 }
             });
     }
@@ -93,6 +94,7 @@
             })
             .done(function(data) {
                 document.getElementById("friend_" + id).remove();
+                GetNotification();
             });
     }
 </script>
