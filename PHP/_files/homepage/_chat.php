@@ -1,0 +1,267 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="chat_box">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chat_header">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="<?php echo $_SITE['path'] ?>/public/img/main/<?php echo $user->avatar ?>" style="max-width:35px;">
+                                </div>
+                                <div class="col-md-1">
+
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <?php if ($url != 'index') { ?>
+                                            <div class="col-md-1">
+                                                <img src="<?php echo $_SITE['path'] ?>/public/img/main/<?php echo $row->avatar ?>" style="max-width:50px;">
+                                            </div>
+                                            <div class="col-md-11">
+                                                <p style="color:white;"><?php echo $row->username ?></p>
+
+                                            </div>
+                                        <?php } else { ?>
+
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chat_search">
+                            <input type="text" placeholder="Suchen...." oninput="UserSearch()" id="user_search">
+                        </div>
+                        <div class="chat_contact" id="chat_contact">
+
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <?php if ($url != 'index') { ?>
+                            <div class="chat_messagecontainer" id="chat_messagecontainer">
+                                <?php foreach (Message::GetAll($chat->id) as $as => $message) { ?>
+                                    <?php if ($message->user_id == $user->id) { ?>
+                                        <div class="row">
+                                            <div class="col-md-6"></div>
+                                            <div class="col-md-6">
+                                                <div class="chat_messagebox">
+                                                    {MESSAGE}<br><br>
+                                                    <small style="color:#e0e0e0;font-size:10px;float:right;">
+                                                        {DATE} </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } else { ?>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="chat_messagebox">
+                                                    {MESSAGE}<br><br>
+                                                    <small style="color:#e0e0e0;font-size:10px;float:right;">
+                                                        {DATE} </small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6"></div>
+                                        </div>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <input type="text" class="input" placeholder="Deine Nachricht..." id="message">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="button green" onclick="SendMessage();">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <?php } else { ?>
+                            <h1 style="margin-top:43%;color:white;">
+                                <center>CHAT</center>
+                            </h1>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    window.onload = function() {
+        GetChatList();
+    }
+
+    setInterval(() => {
+        ClearContacts();
+        GetChatList();
+    }, 30000);
+
+    function AddContactForFriend(username, avatar, id) {
+        $(".chat_contact").append('<div  class="chat_user">\n\
+                \n\<div class="row">\n\
+                \n\<div class="col-md-3">\n\
+                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '">\n\
+                \n\</div>\n\
+                \n\<div class="col-md-6">\n\
+                \n\<b>' + username + '</b>\n\
+                \n\<p>{Nachricht}</p>\n\
+                \n\</div>\n\
+                \n\<div class="col-md-3">\n\
+                \n\<button class="button green" onclick="SendRequest(' + id + ')" style="width:auto;margin-top:2px;padding-left:20px;padding-right:20px;" id="friend_' + id + '">\n\
+                \n\<i class="fas fa-user-plus"></i>\n\
+                \n\</button>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+            ');
+    }
+
+    function AddContact(username, avatar, id, message) {
+        $(".chat_contact").append('<a href="<?php echo $_SITE['path'] ?>/chat/' + id + '" class="chat_user">\n\
+                \n\<div class="row">\n\
+                \n\<div class="col-md-3">\n\
+                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '">\n\
+                \n\</div>\n\
+                \n\<div class="col-md-9">\n\
+                \n\<b>' + username + '</b>\n\
+                \n\<p>' + message + '</p>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+            ');
+    }
+
+    function UserSearch() {
+        ClearContacts()
+
+        var text = document.getElementById("user_search").value;
+
+        if (text.trim() == "") {
+
+        } else {
+            $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
+                    type: "all",
+                    username: text
+                })
+                .done(function(data) {
+                    for (x in data) {
+                        console.log(data[x].username)
+                        AddContactForFriend(data[x].username, data[x].avatar, data[x].id);
+
+                        if (data[x].status == 1) {
+                            text = "friend_" + data[x].id
+                            var element = document.getElementById(text);
+                            element.classList.remove("green");
+                            var element = document.getElementById(text);
+                            element.classList.add("yellow");
+                            document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
+                            document.getElementById(text).removeAttribute("onclick");
+                        } else if (data[x].status == 2) {
+                            text = "friend_" + data[x].id
+                            var element = document.getElementById(text);
+                            element.classList.remove("green");
+                            var element = document.getElementById(text);
+                            element.classList.add("blue");
+                            document.getElementById(text).innerHTML = '<i class="fas fa-comment"></i>';
+                            document.getElementById(text).removeAttribute("onclick");
+                            document.getElementById(text).setAttribute("onclick", "BeginChat(" + data[x].id + ")");
+                        }
+                    }
+                });
+        }
+    }
+
+
+    function ClearContacts() {
+        $("#chat_contact").html("");
+        $("#chat_contact").html("");
+        $("#chat_contact").html("");
+    }
+
+    function SendRequest(id) {
+        $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
+                type: "add",
+                id: id
+            })
+            .done(function(data) {
+                if (data.type == 'success') {
+                    text = "friend_" + id
+                    var element = document.getElementById(text);
+                    element.classList.remove("green");
+                    var element = document.getElementById(text);
+                    element.classList.add("yellow");
+                    document.getElementById(text).innerHTML = '<i class="fas fa-clock"></i>';
+                    document.getElementById(text).removeAttribute("onclick");
+                }
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: data.type,
+                    title: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            });
+    }
+
+    function RemoveFriend(id) {
+        $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
+                type: "remove",
+                id: id
+            })
+            .done(function(data) {
+                if (data.type == 'success') {
+                    text = "friend_" + id
+                    var element = document.getElementById(text);
+                    element.classList.remove("red");
+                    var element = document.getElementById(text);
+                    element.classList.add("green");
+                    document.getElementById(text).innerHTML = '<i class="fas fa-user-plus"></i>';
+                }
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: data.type,
+                    title: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            });
+    }
+
+
+    function BeginChat(id) {
+        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                type: "create",
+                id: id
+            })
+            .done(function(data) {
+                window.location = "<?php echo $_SITE['path'] ?>/chat/" + data.id
+            });
+    }
+
+    function GetChatList() {
+        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                type: "getlist"
+            })
+            .done(function(data) {
+                for (x in data) {
+                    if (data[x].message == null) {
+                        data[x].message = ""
+                    }
+                    AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
+                }
+            });
+    }
+
+    function ClearMessage() {
+        //chat_messagecontainer
+        $("#chat_messagecontainer").html("");
+        $("#chat_messagecontainer").html("");
+        $("#chat_messagecontainer").html("");
+    }
+</script>

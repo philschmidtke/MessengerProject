@@ -1,0 +1,17 @@
+.btnal {
+    text-decoration: none;
+    color: green;
+}
+
+.btnar {
+    text-decoration: none;
+    color: lightskyblue;
+}
+
+
+.btnal:hover {
+    color: white;
+}
+.btnar:hover {
+    color: white;
+}
