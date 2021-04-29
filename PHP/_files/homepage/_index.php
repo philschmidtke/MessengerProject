@@ -202,6 +202,7 @@
                   AddMessage("Fehler: " + data.msg + ". Bitte probiere es erneut!", 1);
                   ScrollDown()
                 } else if (data.type == 'success') {
+                  localStorage.setItem(data.username, data.msg);
                   window.location = "<?php echo $_SITE['path'] . '/chat' ?>";
                 }
               });

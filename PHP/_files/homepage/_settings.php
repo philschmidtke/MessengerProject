@@ -53,9 +53,24 @@
                                 </div>
                             </form>
                         </div>
+                        <div class="col-md-6">
+                            <h3 style="color:white;margin-top:50px;">Dein Schlüssel</h3>
+                            <input type="text" id="mykey" class="input" value="" placeholder="Mein Key">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+
+getKey();
+
+function getKey() {
+    document.getElementById("mykey").value = localStorage.getItem('<?php echo $user->username ?>');
+}
+
+</script>

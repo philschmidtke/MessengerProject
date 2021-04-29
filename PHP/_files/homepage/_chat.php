@@ -141,7 +141,7 @@
         var text = document.getElementById("user_search").value;
 
         if (text.trim() == "") {
-
+            GetChatList();
         } else {
             $.post("<?php echo $_SITE['path'] . '/public/load/user.php' ?>", {
                     type: "all",
@@ -263,5 +263,53 @@
         $("#chat_messagecontainer").html("");
         $("#chat_messagecontainer").html("");
         $("#chat_messagecontainer").html("");
+    }
+
+
+    function AddMessage(type, message, date) {
+        if (type == 1) {
+            $(".chat_messagecontainer").append('<div class="row">\n\
+                \n\<div class="col-md-6"></div>\n\
+                \n\<div class="col-md-6">\n\
+                \n\<div class="chat_messagebox">' + message + '<br><br>\n\
+                \n\ <small style="color:#e0e0e0;font-size:10px;float:right;">' + date + '</small>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+            ');
+        }
+
+        if (type == 2) {
+            $(".chat_messagecontainer").append('<div class="row">\n\
+                \n\<div class="col-md-6">\n\
+                \n\<div class="chat_messagebox">' + message + '<br><br>\n\
+                \n\ <small style="color:#e0e0e0;font-size:10px;float:right;">' + date + '</small>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+                \n\<div class="col-md-6"></div>\n\
+                \n\</div>\n\
+            ');
+        }
+    }
+
+    function SendMessage() {
+        text = document.getElementById("message").value
+
+        $.post("<?php echo $_SITE['path'] . '/public/load/chat.php' ?>", {
+                type: "send",
+                chat: "<?php echo $chat->id ?>",
+                message: text
+            })
+            .done(function(data) {
+                console.log("Erfolg");
+                if (data.type == 'success') {
+                    AddMessage(1, text, data.time);
+                    document.getElementById("message").value = ""
+                    console.log(data.msg);
+                } else {
+                    console.log(data.msg);
+                }
+            });
+
     }
 </script>

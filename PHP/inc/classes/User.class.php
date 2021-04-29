@@ -30,17 +30,10 @@ class User {
         return true;
     }
 
-    public static function GenerateKey() {
-        $keypair = sodium_crypto_box_keypair();
-
-        return $keypair;
-    }
-
     public static function Add($username, $password, $key) {
         global $mysqli;
 
         $password = password_hash($password, PASSWORD_DEFAULT);
-        $pubkey = base64_encode(sodium_crypto_box_publickey($key));
 
         $mysqli->query("INSERT INTO users SET username = '".$username."', password = '".$password."', avatar = 'avatar.png', pubkey = '".$key."'");
 

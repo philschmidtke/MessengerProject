@@ -175,14 +175,21 @@ if($status == 222) {
         $success = true;
         $type = "success";
 
-        User::Add( $_SESSION['reg_username'], $password);
+        $keypair = sodium_crypto_box_keypair();
+        $publicpair = sodium_crypto_box_publickey($keypair);
+
+        $publickey = base64_encode($publicpair);
+        $privatekey = base64_encode($keypair);
+
+        User::Add($_SESSION['reg_username'], $password, $publickey);
         $_SESSION["username"] = $_SESSION['reg_username'];
 
-        $msg = "Erfolg";
+        $msg = $privatekey;
     }
 
     $array = array(
         "type" => $type,
+        "username" => $_SESSION['reg_username'],
         "msg" => $msg
     );
 
