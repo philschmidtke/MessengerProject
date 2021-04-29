@@ -84,7 +84,7 @@
         $(".chat_contact").append('<div  class="chat_user">\n\
                 \n\<div class="row">\n\
                 \n\<div class="col-md-3">\n\
-                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '">\n\
+                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '" style="max-width:50px;">\n\
                 \n\</div>\n\
                 \n\<div class="col-md-6">\n\
                 \n\<b>' + username + '</b>\n\
@@ -103,7 +103,7 @@
         $(".chat_contact").append('<a href="<?php echo $_SITE['path'] ?>/chat/' + id + '" class="chat_user">\n\
                 \n\<div class="row">\n\
                 \n\<div class="col-md-3">\n\
-                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '">\n\
+                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '" style="max-width:50px;">\n\
                 \n\</div>\n\
                 \n\<div class="col-md-9">\n\
                 \n\<b>' + username + '</b>\n\
