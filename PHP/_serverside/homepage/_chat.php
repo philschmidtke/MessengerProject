@@ -2,7 +2,7 @@
 
 $url = $GET[1];
 
-if($url == "" OR $url == " " OR User::CheckID($url) == false) {
+if($url == "" OR $url == " ") {
     $url = 'index';
 }
 
