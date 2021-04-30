@@ -109,6 +109,14 @@ class Message {
         return $row->id;
     }
 
+    public static function CountMessage($chat) {
+        global $mysqli;
+        global $user;
+        
+        $query = $mysqli->query("SELECT id FROM chat_message WHERE chat_id = '".$chat."' AND user_id != '".$user->id."' AND status = '1'");
+        
+        return $query->num_rows;
+    }
 
 
 

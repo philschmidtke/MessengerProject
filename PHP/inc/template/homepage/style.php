@@ -270,4 +270,10 @@
         border:0px;
         color:white;
     }
+
+    .alert.alert-info {
+        background:#1a237e;
+        border:0px;
+        color:white;
+    }
 </style>

@@ -16,7 +16,7 @@
                                     <div class="row">
                                         <?php if ($url != 'index') { ?>
                                             <div class="col-md-1">
-                                                <img src="<?php echo $_SITE['path'] ?>/public/img/main/<?php echo $row->avatar ?>" style="max-width:50px;">
+                                                <img src="<?php echo $_SITE['path'] ?>/public/img/main/<?php echo $row->avatar ?>" style="max-width:35px;">
                                             </div>
                                             <div class="col-md-11">
                                                 <p style="color:white;"><?php echo $row->username ?></p>
@@ -72,12 +72,24 @@
     window.onload = function () {
         LoadMessage();
         UserSearch();
+
+        $(document).keydown(function (e) {
+            if (e.keyCode == 13) {
+                SendMessage();
+            }
+        });
+
     }
 
 
     setInterval(() => {
         LoadMessage();
     }, 1000);
+
+
+    setInterval(() => {
+        UserSearch();
+    }, 30000);
 
 
     function AddContactForFriend(username, avatar, id) {
@@ -87,7 +99,7 @@
                 \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '" style="max-width:50px;">\n\
                 \n\</div>\n\
                 \n\<div class="col-md-6">\n\
-                \n\<b>' + username + '</b>\n\
+                \n\<p style="margin-top:15px;"><b>' + username + '</b></p>\n\
                 \n\</div>\n\
                 \n\<div class="col-md-3">\n\
                 \n\<button class="button green" onclick="SendRequest(' + id + ')" style="width:auto;margin-top:2px;padding-left:20px;padding-right:20px;" id="friend_' + id + '">\n\
@@ -99,18 +111,32 @@
             ');
     }
 
-    function AddContact(username, avatar, id, message) {
-        $(".chat_contact").append('<a href="<?php echo $_SITE['path'] ?>/chat/' + id + '" class="chat_user">\n\
+    function AddContact(username, avatar, id, message, count) {
+        if (count == 0) {
+            $(".chat_contact").append('<a href="<?php echo $_SITE['path'] ?>/chat/' + id + '" class="chat_user">\n\
                 \n\<div class="row">\n\
                 \n\<div class="col-md-3">\n\
                 \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '" style="max-width:50px;">\n\
                 \n\</div>\n\
                 \n\<div class="col-md-9">\n\
-                \n\<b>' + username + '</b>\n\
+                \n\<p style="margin-top:15px;"><b>' + username + '</b></p>\n\
                 \n\</div>\n\
                 \n\</div>\n\
                 \n\</div>\n\
             ');
+        } else {
+            $(".chat_contact").append('<a href="<?php echo $_SITE['path'] ?>/chat/' + id + '" class="chat_user">\n\
+                \n\<div class="row">\n\
+                \n\<div class="col-md-3">\n\
+                \n\<img src="<?php echo $_SITE['path'] ?>/public/img/main/' + avatar + '" style="max-width:50px;">\n\
+                \n\</div>\n\
+                \n\<div class="col-md-9">\n\
+                \n\<p style="margin-top:15px;"><b>' + username + '</b> <span class="badge bg-warning text-dark">' + count + '</span></p>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+                \n\</div>\n\
+            ');
+        }
     }
 
     function UserSearch() {
@@ -128,7 +154,7 @@
                             if (data[x].message == null) {
                                 data[x].message = ""
                             }
-                            AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message);
+                            AddContact(data[x].username, data[x].avatar, data[x].id, data[x].message, data[x].count);
                         }
                     });
         } else {
@@ -137,7 +163,7 @@
                 username: text
             })
                     .done(function (data) {
-                         ClearContacts();
+                        ClearContacts();
                         for (x in data) {
                             AddContactForFriend(data[x].username, data[x].avatar, data[x].id);
 

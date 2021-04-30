@@ -5,11 +5,7 @@
                 <h5 class="modal-title" id="exampleModalLabel">Benachrichtigungen</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-
-
-
-            </div>
+            <div class="modal-body"></div>
         </div>
     </div>
 </div>
@@ -26,14 +22,14 @@
 
     setInterval(() => {
         GetNotification();
-    }, 30000);
+    }, 5000);
 
     function AddRequest(id, avatar, username) {
         $(".modal-body").append('<div class="box" id="friend_' + id + '" style="margin-bottom:15px;">\n\
         \n\<div class="row">\n\
         \n\<div class="col-md-2">\n\
         \n\ <center>\n\
-        \n\<img src="' + avatar + '" class="avatar" style="margin-top:10px;height:50px;">\n\
+        \n\<img src="' + avatar + '" class="avatar" style="margin-top:10px;height:50px;max-width:50px;">\n\
         \n\</center>\n\
         \n\</div>\n\
         \n\<div class="col-md-10">\n\
@@ -58,6 +54,7 @@
 
     function GetNotification() {
         let i = 0;
+        ClearNotification();
         $.get("<?php echo $_SITE['path'] . '/public/load/notification.php' ?>", {
                 type: 't'
             })
@@ -96,6 +93,12 @@
                 document.getElementById("friend_" + id).remove();
                 GetNotification();
             });
+    }
+    
+    function ClearNotification() {
+        $(".modal-body").html("");
+        $(".modal-body").html("");
+        $(".modal-body").html("");
     }
 </script>
 </body>

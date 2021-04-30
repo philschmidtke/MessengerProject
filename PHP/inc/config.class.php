@@ -24,7 +24,7 @@ $mysqli = $connection->connect();
 
 
 $_SITE = array(
-  "name" => "Chat-System",
+  "name" => "GhostChat",
   "path" => "https://chat.cicek.li",
 );
 

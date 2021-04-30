@@ -1,6 +1,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
+            <div class="alert alert-info" role="alert" style="margin-top:15px;">
+                Speicher dir deinen Schlüssel unbedingt lokal ab z.B. in einem Passwortmanager!
+            </div>
             <div class="chat_box">
                 <?php if ($error == true) { ?>
                     <div class="alert alert-danger" role="alert">
@@ -55,7 +58,15 @@
                         </div>
                         <div class="col-md-6">
                             <h3 style="color:white;margin-top:50px;">Dein Schlüssel</h3>
-                            <input type="text" id="mykey" class="input" value="" placeholder="Mein Key">
+                            <input type="text" id="mykey" class="input" value="" placeholder="Mein Key" style="margin-bottom:15px;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button class="button red" onclick="ResetKey();">Schlüssel zurücksetzen</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="button green" onclick="SaveKey();">Speichern</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -67,10 +78,38 @@
 
 <script>
 
-getKey();
+    getKey();
 
-function getKey() {
-    document.getElementById("mykey").value = localStorage.getItem('<?php echo $user->username ?>');
-}
+    function getKey() {
+        document.getElementById("mykey").value = localStorage.getItem('<?php echo $user->username ?>');
+    }
+
+    function SaveKey() {
+        text = document.getElementById("mykey").value;
+
+        if (text.trim() != "") {
+            localStorage.removeItem('<?php echo $user->username ?>');
+            localStorage.setItem('<?php echo $user->username ?>', text);
+
+            Swal.fire({
+                position: 'top-end',
+                icon: "success",
+                title: "Erfolgreich gespeichert!",
+                showConfirmButton: false,
+                timer: 1500
+            })
+        }
+    }
+
+    function ResetKey() {
+        $.post("<?php echo $_SITE['path'] . '/public/load/settings.php' ?>", {
+            type: "resetkey"
+        })
+                .done(function (data) {
+                    localStorage.removeItem('<?php echo $user->username ?>');
+                    localStorage.setItem('<?php echo $user->username ?>', data.key);
+                    document.getElementById("mykey").value = data.key;
+                });
+    }
 
 </script>

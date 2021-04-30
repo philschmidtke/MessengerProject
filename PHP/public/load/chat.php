@@ -69,7 +69,8 @@ if ($type == 'getlist') {
             "id" => (int) $chat->id,
             "avatar" => $row->avatar,
             "username" => $row->username,
-            "message" => date('d.m.Y H:i', $message)
+            "message" => date('d.m.Y H:i', $message),
+            "count" => (int) Message::CountMessage($chat->id)
         );
     }
 
