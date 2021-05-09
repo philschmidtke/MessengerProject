@@ -4,7 +4,7 @@
 class Config  {
     var $host = '161.97.138.181';
     var $user = 'cicek_db2';
-    var $pass = 'en6R3SjtNQ?b';
+    var $pass = '';
     var $db = 'cicek_db2';
     var $connect;
 
