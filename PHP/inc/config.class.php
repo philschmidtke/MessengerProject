@@ -2,10 +2,10 @@
 //CONFIG
 
 class Config  {
-    var $host = '161.97.138.181';
-    var $user = 'cicek_db2';
+    var $host = '';
+    var $user = '';
     var $pass = '';
-    var $db = 'cicek_db2';
+    var $db = '';
     var $connect;
 
     function connect() {
